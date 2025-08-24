@@ -1,153 +1,217 @@
 import React, { useState } from "react";
+import { auth, db } from "../../firebase/firebase";
+import { signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext.jsx";
-import { AuthAPI, auth } from "../../firebase/firebase.js";
-import {
-  User,
-  Lock,
-  UserCheck,
-  UserPlus,
-  ShieldCheck,
-  CheckSquare,
-} from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { User, UserCheck, UserPlus, X, CheckSquare } from "lucide-react";
+import Footer from "../../components/Footer.jsx";
+
+const roleIcons = {
+  student: <User className="w-24 h-24 text-gray-800" />,
+  teacher: <UserCheck className="w-24 h-24 text-gray-800" />,
+  admin: <UserPlus className="w-24 h-24 text-gray-800" />,
+};
+
+// Demo credentials
+const demoCredentials = {
+  student: { email: "", password: "" },
+  teacher: { email: "", password: "" },
+  admin: { email: "", password: "" },
+};
 
 export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(demoCredentials.student.email);
+  const [password, setPassword] = useState(demoCredentials.student.password);
   const [role, setRole] = useState("student");
   const [error, setError] = useState("");
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
   const navigate = useNavigate();
-  const { setDemoUser } = useAuth();
 
-  const adminDemo = { email: "a@gmail.com", password: "123" };
+  const handleRoleClick = (r) => {
+    setRole(r);
+    setEmail(demoCredentials[r].email);
+    setPassword(demoCredentials[r].password);
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-    if (role === "admin") {
-      if (email === adminDemo.email && password === adminDemo.password) {
-        setDemoUser("admin");
-        navigate("/admin");
-      } else {
-        setError("Invalid admin credentials.");
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        setError("User not found in database");
+        await signOut(auth);
+        return;
       }
-    } else {
-      try {
-        await AuthAPI.signInWithEmailAndPassword(auth, email, password);
-        setDemoUser(role);
-        if (role === "teacher") navigate("/teacher");
-        else navigate("/student");
-      } catch (err) {
-        if (
-          err.code === "auth/user-not-found" ||
-          err.code === "auth/wrong-password"
-        ) {
-          setError("Invalid email or password.");
-        } else if (err.code === "auth/invalid-email") {
-          setError("Invalid email format.");
-        } else {
-          setError("Login error: " + err.message);
-        }
+
+      const userData = userDoc.data();
+      if (userData.role !== role) {
+        setError(`This account is registered as ${userData.role}.`);
+        await signOut(auth);
+        return;
       }
+
+      if (role === "admin") navigate("/admin");
+      else if (role === "teacher") navigate("/teacher");
+      else navigate("/student");
+
+      toast.success("Login successful!");
+    } catch (err) {
+      setError("Invalid email or password.");
+      console.error(err);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!forgotEmail) {
+      toast.info("Please enter your email.");
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, forgotEmail);
+      toast.success("Password reset email sent!");
+      setShowForgotModal(false);
+      setForgotEmail("");
+    } catch (err) {
+      toast.error("Error sending reset email: " + err.message);
     }
   };
 
   return (
-    <div className="flex flex-col justify-center items-center min-h-screen bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 p-4">
-      {/* Branding Header */}
-      <div className="flex items-center mb-6">
-        <div className="bg-blue-600 text-white rounded-full p-3 shadow-lg">
-          <CheckSquare size={28} />
+    <div className="min-h-screen flex flex-col bg-gray-100">
+      <ToastContainer position="top-right" autoClose={2500} theme="colored" />
+
+      {/* Navbar with Attendance Logo */}
+      <nav className="bg-black text-white p-4 flex justify-between items-center shadow-lg">
+        {/* Static Attendance Icon on left */}
+        <div className="flex items-center gap-2">
+          <CheckSquare className="w-8 h-8 text-white" />
+          <span className="font-bold text-lg">Smart Attendance</span>
         </div>
-        <h1 className="ml-3 text-3xl font-extrabold text-gray-800">
-          Smart Attendance System
-        </h1>
-      </div>
 
-      {/* Login Card */}
-      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-sm md:max-w-md">
-        <h2 className="text-2xl font-bold mb-2 text-center text-gray-700">
-          Welcome Back
-        </h2>
-        <p className="text-sm text-gray-500 mb-6 text-center">
-          Sign in to manage your attendance records
-        </p>
+        {/* Role Buttons */}
+        <div className="flex gap-6">
+          {["student", "teacher", "admin"].map((r) => (
+            <button
+              key={r}
+              className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
+                role === r ? "bg-white text-black shadow" : "hover:bg-gray-800/70"
+              }`}
+              onClick={() => handleRoleClick(r)}
+            >
+              {r.charAt(0).toUpperCase() + r.slice(1)}
+            </button>
+          ))}
+        </div>
+      </nav>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
-        )}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-4">
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-4">
-          {/* Email Input */}
-          <div className="flex items-center border rounded-lg p-2 focus-within:ring-2 focus-within:ring-blue-400 transition">
-            <User className="text-gray-400 mr-2" size={20} />
+        {/* Demo Credentials Info */}
+        <div className="bg-gray-100 p-1 mt-0 rounded text-gray-700 text-sm w-full max-w-md">
+          <p className="font-semibold mb-0">Demo Credentials:</p>
+          <p>Student: s@gmail.com / 123456</p>
+          <p>Teacher: h@gmail.com / 123456</p>
+          <p>Admin: vinodnangare01@gmail.com / 123456</p>
+        </div>
+
+        {/* Login Card */}
+        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
+
+          {/* Role Icon */}
+          <div className="mb-6 flex flex-col items-center">
+            {roleIcons[role]}
+            <p className="mt-2 text-gray-800 font-semibold text-lg capitalize">{role}</p>
+          </div>
+
+          <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">
+            Login as {role.charAt(0).toUpperCase() + role.slice(1)}
+          </h2>
+
+          {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+
+          <form onSubmit={handleLogin} className="w-full space-y-4">
             <input
               type="email"
-              placeholder="Email"
-              className="flex-1 outline-none"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800"
               required
             />
-          </div>
-
-          {/* Password Input */}
-          <div className="flex items-center border rounded-lg p-2 focus-within:ring-2 focus-within:ring-blue-400 transition">
-            <Lock className="text-gray-400 mr-2" size={20} />
             <input
               type="password"
-              placeholder="Password"
-              className="flex-1 outline-none"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full border rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-gray-800"
               required
             />
-          </div>
-
-          {/* Role Selection */}
-          <div className="flex items-center border rounded-lg p-2 focus-within:ring-2 focus-within:ring-blue-400 transition">
-            {role === "student" && (
-              <UserPlus className="text-gray-400 mr-2" size={20} />
-            )}
-            {role === "teacher" && (
-              <UserCheck className="text-gray-400 mr-2" size={20} />
-            )}
-            {role === "admin" && (
-              <ShieldCheck className="text-gray-400 mr-2" size={20} />
-            )}
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="flex-1 outline-none bg-transparent"
+            <button
+              type="submit"
+              className="w-full bg-black text-white py-2 rounded-md font-semibold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2"
             >
-              <option value="student">Student</option>
-              <option value="teacher">Teacher</option>
-              <option value="admin">Admin</option>
-            </select>
+              Login
+            </button>
+          </form>
+
+          <div className="mt-4 text-center">
+            <button
+              onClick={() => setShowForgotModal(true)}
+              className="text-black underline text-sm hover:text-gray-700 transition-colors"
+            >
+              Forgot password?
+            </button>
           </div>
 
-          <button
-            type="submit"
-            className="bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition font-semibold"
-          >
-            Login
-          </button>
-        </form>
-
-        {/* Demo Credentials */}
-        <div className="mt-6 text-xs text-gray-500 space-y-1">
-          <p className="font-semibold text-gray-600">Demo Credentials:</p>
-          <p>
-            <strong>Admin:</strong> a@gmail.com / 123
-          </p>
-          <p>
-            <strong>Teacher:</strong> teacher@test.com / teacher123
-          </p>
-          <p>
-            <strong>Student:</strong> student@test.com / student123
-          </p>
+          {/* Forgot Password Modal */}
+          {showForgotModal && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+              <div className="bg-white rounded-lg p-6 w-96 shadow-lg relative">
+                <button
+                  className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+                  onClick={() => setShowForgotModal(false)}
+                >
+                  <X size={20} />
+                </button>
+                <h3 className="text-lg font-semibold mb-3">Reset Password</h3>
+                <p className="text-gray-600 mb-4">
+                  Enter your email to receive a password reset link.
+                </p>
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  placeholder="Email"
+                  className="w-full border rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-gray-800"
+                />
+                <div className="flex justify-end gap-2">
+                  <button
+                    className="px-4 py-2 rounded bg-gray-200"
+                    onClick={() => setShowForgotModal(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="px-4 py-2 rounded bg-black text-white"
+                    onClick={handleForgotPassword}
+                  >
+                    Send Link
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
+
+      <Footer />
     </div>
   );
 }

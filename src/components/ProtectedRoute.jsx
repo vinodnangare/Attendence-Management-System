@@ -13,23 +13,21 @@ export default function ProtectedRoute({ allowedRoles }) {
     );
   }
 
-  // Allow access for demo logins (no user/profile)
-  if (!user && !profile) return <Outlet />;
+  if (!user || !profile) {
+    // If not logged in → send to login
+    return <Navigate to="/" replace />;
+  }
 
-  if (!user) return <Navigate to="/" replace />;
-
-  if (!profile || !allowedRoles.includes(profile.role)) {
-    // Role mismatch → send to their dashboard if any
+  if (!allowedRoles.includes(profile.role)) {
+    // Role mismatch → redirect to correct dashboard
     const fallback =
-      profile?.role === "admin"
+      profile.role === "admin"
         ? "/admin"
-        : profile?.role === "teacher"
+        : profile.role === "teacher"
         ? "/teacher"
-        : profile?.role === "student"
-        ? "/student"
-        : "/";
+        : "/student";
     return <Navigate to={fallback} replace />;
   }
 
-  return <Outlet />;
+  return <Outlet />; // Allowed
 }
