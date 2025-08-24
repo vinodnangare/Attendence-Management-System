@@ -13,6 +13,7 @@ const roleIcons = {
   teacher: <UserCheck className="w-24 h-24 text-gray-800" />,
   admin: <UserPlus className="w-24 h-24 text-gray-800" />,
 };
+console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
 
 // Demo credentials
 const demoCredentials = {
