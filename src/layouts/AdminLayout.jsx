@@ -1,9 +1,9 @@
 // src/components/AdminLayout.jsx
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Outlet } from "react-router-dom";
+import { Link, Outlet } from "react-router-dom";
 
-export default function AdminLayout({ children }) {
+export default function AdminLayout() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -17,21 +17,36 @@ export default function AdminLayout({ children }) {
         <h1 className="text-2xl font-bold text-center">Smart Attendance</h1>
 
         <nav className="mt-10">
-          <a href="/admin" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          <Link
+            to="/admin"
+            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+          >
             Dashboard
-          </a>
-          <a href="/admin/teachers" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          </Link>
+          <Link
+            to="/admin/teachers"
+            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+          >
             Manage Teachers
-          </a>
-          <a href="/admin/students" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          </Link>
+          <Link
+            to="/admin/students"
+            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+          >
             Manage Students
-          </a>
-          <a href="/admin/classes" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          </Link>
+          <Link
+            to="/admin/classes"
+            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+          >
             Manage Classes
-          </a>
-          <a href="/admin/attendance" className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700">
+          </Link>
+          <Link
+            to="/admin/attendance"
+            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
+          >
             Manage Attendance
-          </a>
+          </Link>
         </nav>
       </aside>
 

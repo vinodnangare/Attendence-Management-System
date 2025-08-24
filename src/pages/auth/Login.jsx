@@ -13,13 +13,12 @@ const roleIcons = {
   teacher: <UserCheck className="w-24 h-24 text-gray-800" />,
   admin: <UserPlus className="w-24 h-24 text-gray-800" />,
 };
-console.log(import.meta.env.VITE_FIREBASE_PROJECT_ID);
 
 // Demo credentials
 const demoCredentials = {
-  student: { email: "", password: "" },
-  teacher: { email: "", password: "" },
-  admin: { email: "", password: "" },
+  student: { email: "s@gmail.com", password: "123456" },
+  teacher: { email: "h@gmail.com", password: "123456" },
+  admin: { email: "vinodnangare01@gmail.com", password: "123456" },
 };
 
 export default function Login() {
@@ -29,6 +28,7 @@ export default function Login() {
   const [error, setError] = useState("");
   const [showForgotModal, setShowForgotModal] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleRoleClick = (r) => {
@@ -88,16 +88,16 @@ export default function Login() {
     <div className="min-h-screen flex flex-col bg-gray-100">
       <ToastContainer position="top-right" autoClose={2500} theme="colored" />
 
-      {/* Navbar with Attendance Logo */}
-      <nav className="bg-black text-white p-4 flex justify-between items-center shadow-lg">
-        {/* Static Attendance Icon on left */}
+      {/* Navbar */}
+      <nav className="bg-black text-white p-4 flex justify-between items-center shadow-lg relative">
+        {/* Logo */}
         <div className="flex items-center gap-2">
           <CheckSquare className="w-8 h-8 text-white" />
           <span className="font-bold text-lg">Smart Attendance</span>
         </div>
 
-        {/* Role Buttons */}
-        <div className="flex gap-6">
+        {/* Desktop Role Buttons */}
+        <div className="hidden md:flex gap-6">
           {["student", "teacher", "admin"].map((r) => (
             <button
               key={r}
@@ -110,22 +110,57 @@ export default function Login() {
             </button>
           ))}
         </div>
+
+        {/* Mobile Hamburger Menu */}
+        <div className="md:hidden">
+          <button
+            className="focus:outline-none"
+            onClick={() => setMobileMenuOpen((prev) => !prev)}
+          >
+            <svg
+              className="w-6 h-6 text-white"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {mobileMenuOpen && (
+            <div className="absolute right-0 mt-2 w-40 bg-white text-black rounded shadow-lg flex flex-col z-50">
+              {["student", "teacher", "admin"].map((r) => (
+                <button
+                  key={r}
+                  className={`px-4 py-2 text-left hover:bg-gray-200 transition-colors ${
+                    role === r ? "font-bold bg-gray-100" : ""
+                  }`}
+                  onClick={() => {
+                    handleRoleClick(r);
+                    setMobileMenuOpen(false);
+                  }}
+                >
+                  {r.charAt(0).toUpperCase() + r.slice(1)}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
       </nav>
 
-      <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-4">
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center p-6 space-y-4 w-full max-w-md mx-auto">
 
         {/* Demo Credentials Info */}
-        <div className="bg-gray-100 p-1 mt-0 rounded text-gray-700 text-sm w-full max-w-md">
-          <p className="font-semibold mb-0">Demo Credentials:</p>
+        <div className="bg-gray-100 p-3 rounded text-gray-700 text-sm w-full">
+          <p className="font-semibold mb-1">Demo Credentials:</p>
           <p>Student: s@gmail.com / 123456</p>
           <p>Teacher: h@gmail.com / 123456</p>
           <p>Admin: vinodnangare01@gmail.com / 123456</p>
         </div>
 
         {/* Login Card */}
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8 flex flex-col items-center">
-
-          {/* Role Icon */}
+        <div className="w-full bg-white rounded-xl shadow-lg p-6 flex flex-col items-center">
           <div className="mb-6 flex flex-col items-center">
             {roleIcons[role]}
             <p className="mt-2 text-gray-800 font-semibold text-lg capitalize">{role}</p>
@@ -156,7 +191,7 @@ export default function Login() {
             />
             <button
               type="submit"
-              className="w-full bg-black text-white py-2 rounded-md font-semibold hover:bg-gray-900 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-black text-white py-2 rounded-md font-semibold hover:bg-gray-900 transition-colors"
             >
               Login
             </button>
@@ -170,47 +205,47 @@ export default function Login() {
               Forgot password?
             </button>
           </div>
-
-          {/* Forgot Password Modal */}
-          {showForgotModal && (
-            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-              <div className="bg-white rounded-lg p-6 w-96 shadow-lg relative">
-                <button
-                  className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
-                  onClick={() => setShowForgotModal(false)}
-                >
-                  <X size={20} />
-                </button>
-                <h3 className="text-lg font-semibold mb-3">Reset Password</h3>
-                <p className="text-gray-600 mb-4">
-                  Enter your email to receive a password reset link.
-                </p>
-                <input
-                  type="email"
-                  value={forgotEmail}
-                  onChange={(e) => setForgotEmail(e.target.value)}
-                  placeholder="Email"
-                  className="w-full border rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-gray-800"
-                />
-                <div className="flex justify-end gap-2">
-                  <button
-                    className="px-4 py-2 rounded bg-gray-200"
-                    onClick={() => setShowForgotModal(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className="px-4 py-2 rounded bg-black text-white"
-                    onClick={handleForgotPassword}
-                  >
-                    Send Link
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      {showForgotModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-11/12 max-w-sm shadow-lg relative">
+            <button
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-900"
+              onClick={() => setShowForgotModal(false)}
+            >
+              <X size={20} />
+            </button>
+            <h3 className="text-lg font-semibold mb-3">Reset Password</h3>
+            <p className="text-gray-600 mb-4">
+              Enter your email to receive a password reset link.
+            </p>
+            <input
+              type="email"
+              value={forgotEmail}
+              onChange={(e) => setForgotEmail(e.target.value)}
+              placeholder="Email"
+              className="w-full border rounded-md px-4 py-2 mb-4 focus:outline-none focus:ring-2 focus:ring-gray-800"
+            />
+            <div className="flex justify-end gap-2">
+              <button
+                className="px-4 py-2 rounded bg-gray-200"
+                onClick={() => setShowForgotModal(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 rounded bg-black text-white"
+                onClick={handleForgotPassword}
+              >
+                Send Link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
