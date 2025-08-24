@@ -33,7 +33,3 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
-# Firebase (if you have credentials)
-firebase-debug.log
-.firebase/
-firebase
