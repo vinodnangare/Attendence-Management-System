@@ -1,10 +1,19 @@
 // src/components/AdminLayout.jsx
 import React, { useState } from "react";
-import { Menu, X } from "lucide-react";
-import { Link, Outlet } from "react-router-dom";
+import { Menu, X, Home, Users, GraduationCap, Book, ClipboardList, LogOut } from "lucide-react";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 
 export default function AdminLayout() {
   const [isOpen, setIsOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const linkClasses = ({ isActive }) =>
+    `flex items-center gap-2 py-2.5 px-4 rounded transition duration-200 text-sm font-medium
+     ${isActive ? "bg-blue-600 text-white font-semibold shadow-md" : "text-gray-200 hover:bg-gray-700 hover:text-white"}`;
+
+  const handleLogout = () => {
+    navigate("/");
+  };
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -16,74 +25,60 @@ export default function AdminLayout() {
       >
         <h1 className="text-2xl font-bold text-center">Smart Attendance</h1>
 
-        <nav className="mt-10">
-          <Link
-            to="/admin"
-            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-          >
+        <nav className="mt-10 space-y-1">
+          <NavLink to="/admin" end className={linkClasses}>
+            <Home size={18} />
             Dashboard
-          </Link>
-          <Link
-            to="/admin/teachers"
-            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-          >
+          </NavLink>
+          <NavLink to="/admin/teachers" className={linkClasses}>
+            <Users size={18} />
             Manage Teachers
-          </Link>
-          <Link
-            to="/admin/students"
-            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-          >
+          </NavLink>
+          <NavLink to="/admin/students" className={linkClasses}>
+            <GraduationCap size={18} />
             Manage Students
-          </Link>
-          <Link
-            to="/admin/classes"
-            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-          >
+          </NavLink>
+          <NavLink to="/admin/classes" className={linkClasses}>
+            <Book size={18} />
             Manage Classes
-          </Link>
-          <Link
-            to="/admin/attendance"
-            className="block py-2.5 px-4 rounded transition duration-200 hover:bg-gray-700"
-          >
+          </NavLink>
+          <NavLink to="/admin/attendance" className={linkClasses}>
+            <ClipboardList size={18} />
             Manage Attendance
-          </Link>
+          </NavLink>
         </nav>
       </aside>
 
-      {/* Main content */}
+      {/* Content */}
       <div className="flex-1 flex flex-col">
-        {/* Mobile header */}
+        {/* Mobile Header */}
         <header className="bg-white shadow-md p-4 flex items-center justify-between md:hidden">
           <button onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
           <h2 className="text-lg font-semibold">Admin Dashboard</h2>
           <button
-            onClick={() => {
-              // logout logic here
-              window.location.href = "/";
-            }}
-            className="bg-red-500 text-white px-3 py-1 rounded"
+            onClick={handleLogout}
+            className="flex items-center gap-1 bg-red-500 text-white px-3 py-1 rounded"
           >
+            <LogOut size={16} />
             Logout
           </button>
         </header>
 
-        {/* Desktop top bar */}
+        {/* Desktop Header */}
         <div className="hidden md:flex justify-between items-center bg-white p-4 shadow">
           <h2 className="text-xl font-bold">Admin Dashboard</h2>
           <button
-            onClick={() => {
-              // logout logic here
-              window.location.href = "/";
-            }}
-            className="bg-red-500 text-white px-3 py-1 rounded"
+            onClick={handleLogout}
+            className="flex items-center gap-1 bg-red-500 text-white px-3 py-1 rounded"
           >
+            <LogOut size={16} />
             Logout
           </button>
         </div>
 
-        {/* Actual page content */}
+        {/* Main Content */}
         <main className="flex-1 p-4">
           <Outlet />
         </main>

@@ -3,11 +3,7 @@ import { AuthAPI, auth, db } from "../../firebase/firebase.js";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate, Link } from "react-router-dom";
 
-/**
- * Demo-only Register:
- * Lets you pick a role for quick testing.
- * In production, only Admin should create Teacher/Student accounts.
- */
+
 export default function Register() {
   const [form, setForm] = useState({
     name: "",
@@ -36,7 +32,7 @@ export default function Register() {
       await setDoc(doc(db, "users", res.user.uid), {
         name: form.name || "",
         email: form.email,
-        role: form.role,       // "admin" | "teacher" | "student"
+        role: form.role,      
         classId: form.classId || null,
         createdAt: Date.now(),
       });

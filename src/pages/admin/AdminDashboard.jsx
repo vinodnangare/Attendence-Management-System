@@ -15,8 +15,8 @@ import "react-toastify/dist/ReactToastify.css";
 import { Users, GraduationCap, BookOpen, Search } from "lucide-react";
 
 export default function AdminDashboard() {
-  const [users, setUsers] = useState([]); // all users
-  const [classes, setClasses] = useState([]); // all classes
+  const [users, setUsers] = useState([]); 
+  const [classes, setClasses] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [teacherFilter, setTeacherFilter] = useState("");
   const [studentFilter, setStudentFilter] = useState("");
@@ -103,7 +103,6 @@ export default function AdminDashboard() {
       map[c.id] = { teachers: [], students: [], meta: c };
     });
 
-    // also ensure common class keys (FY SY ...) exist if not present in classes collection
     ["FY", "SY", "TY", "BTECH"].forEach((k) => {
       if (!map[k]) map[k] = { teachers: [], students: [], meta: { id: k, name: k } };
     });
@@ -126,11 +125,9 @@ export default function AdminDashboard() {
       </div>
     );
 
-  // Example toasts (you can wire actual handlers)
   const handleAdd = () => toast.success("Added successfully!");
   const handleEdit = () => toast.info("Edited successfully!");
 
-  // recent classes for quick glance - newest by createdAt if available
   const recentClasses = [...classes]
     .sort((a, b) => {
       const ta = a.createdAt ? a.createdAt.toMillis?.() ?? new Date(a.createdAt).getTime() : 0;
@@ -149,7 +146,6 @@ export default function AdminDashboard() {
         <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={handleEdit}>Edit</button>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-6">
         <div className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-xl p-6 shadow-md flex items-center gap-4 hover:scale-105 transition">
           <Users size={36} />
@@ -181,7 +177,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Class Tabs */}
       <div className="flex gap-2 mb-6 justify-center flex-wrap">
         {Object.keys(classData).map((cls) => (
           <button

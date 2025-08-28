@@ -14,7 +14,6 @@ export default function ManageStudents() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // dynamic classes
   const [classes, setClasses] = useState([]);
 
   // add form
@@ -24,7 +23,7 @@ export default function ManageStudents() {
     classId: "",
     rollNo: "",
     password: "",
-    gender: "male", // ✅ default
+    gender: "male", 
   });
 
   // edit state

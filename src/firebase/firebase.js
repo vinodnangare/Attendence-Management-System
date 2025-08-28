@@ -21,7 +21,6 @@ import {
 } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 
-// 🔁 Firebase config from environment variables
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
@@ -32,24 +31,19 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// ✅ Initialize main app
 const app = initializeApp(firebaseConfig);
 
-// Optional analytics
 let analytics;
 if (typeof window !== "undefined") {
   analytics = getAnalytics(app);
 }
 
-// ✅ Default Auth & Firestore
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// ✅ Secondary Firebase app for creating teachers without logging out admin
 const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
 export const secondaryAuth = getAuth(secondaryApp);
 
-// 🔹 Auth helpers
 export const AuthAPI = {
   onAuthStateChanged,
   createUserWithEmailAndPassword,
@@ -57,7 +51,6 @@ export const AuthAPI = {
   signOut,
 };
 
-// 🔹 Firestore helpers
 export const DB = {
   doc,
   getDoc,

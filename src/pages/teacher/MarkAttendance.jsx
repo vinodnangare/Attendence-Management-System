@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-// Removed duplicate import
 import { db, DB } from "../../firebase/firebase.js";
 import { updateDoc, doc } from "firebase/firestore";
 import { useAuth } from "../../context/AuthContext.jsx";
@@ -8,14 +7,13 @@ import { UserCheck, Loader2 } from "lucide-react";
 
 function todayKey() {
   const d = new Date();
-  const iso = d.toISOString().slice(0,10); // YYYY-MM-DD
+  const iso = d.toISOString().slice(0,10); 
   return iso;
 }
 
 export default function MarkAttendance() {
   const { profile } = useAuth();
   const classId = profile?.classId;
-  // Fix: subject should be from profile, fallback to empty string
   const subject = (profile && typeof profile.subject === "string" && profile.subject.trim() !== "") ? profile.subject : "";
   const [students, setStudents] = useState([]);
   const [status, setStatus] = useState({}); // {studentId: "present"|"absent"}
@@ -31,7 +29,7 @@ export default function MarkAttendance() {
   useEffect(() => {
     if (!classId) return;
     (async () => {
-      // Load students
+     
       const snap = await DB.getDocs(DB.query(DB.collection(db, "users"),
         DB.where("role", "==", "student"), DB.where("classId", "==", classId)));
       let list = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -44,7 +42,7 @@ export default function MarkAttendance() {
         return 0;
       });
       setStudents(list);
-      // load existing for today, subject, and time, if any
+    
       if (!subject || !selectedTime) return;
       const docId = `${classId}_${profile?.id || "teacher"}_${subject}_${selectedTime}_${dateKey}`;
       const attRef = DB.doc(db, "attendance", docId);
@@ -80,7 +78,7 @@ export default function MarkAttendance() {
   setEditId(null);
   setEditStudents({});
   toast.success("Attendance updated.");
-  setSaving(s => !s); // trigger useEffect to reload records
+  setSaving(s => !s); 
   }
 
   function toggle(id) {

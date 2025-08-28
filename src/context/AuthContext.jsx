@@ -6,8 +6,8 @@ import { doc, getDoc } from "firebase/firestore";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);        // Firebase user
-  const [profile, setProfile] = useState(null);  // {role, name, classId}
+  const [user, setUser] = useState(null);        
+  const [profile, setProfile] = useState(null);  
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,14 +25,12 @@ export function AuthProvider({ children }) {
     return () => unsub();
   }, []);
 
-  // Allow setting a demo user/profile for hardcoded logins
   const setDemoUser = (role) => {
     setUser({ uid: "demo", email: `${role}@test.com` });
     setProfile({ role, name: role.charAt(0).toUpperCase() + role.slice(1), classId: "demo" });
     setLoading(false);
   };
 
-  // Add logout function
   const logout = async () => {
     await AuthAPI.signOut(auth);
     setUser(null);

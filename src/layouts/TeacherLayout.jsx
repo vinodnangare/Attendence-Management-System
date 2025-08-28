@@ -12,12 +12,12 @@ export default function TeacherLayout() {
 
   return (
     <div className="min-h-screen flex bg-gray-50 relative">
-      {/* Desktop Sidebar */}
+   
       <aside className="hidden lg:flex flex-col w-64 bg-white border-r border-gray-200 flex-shrink-0">
         <Sidebar />
       </aside>
 
-      {/* Mobile Sidebar Overlay */}
+   
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 flex lg:hidden">
           <div
@@ -36,9 +36,8 @@ export default function TeacherLayout() {
         </div>
       )}
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col min-h-screen">
-        {/* Navbar */}
+    
         <div className="w-full flex-shrink-0 sticky top-0 z-40 bg-white shadow">
           <div className="flex items-center justify-between px-4 py-3 lg:px-6">
             <button
@@ -53,7 +52,7 @@ export default function TeacherLayout() {
           </div>
         </div>
 
-        {/* Page Content */}
+      
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>
@@ -61,7 +60,7 @@ export default function TeacherLayout() {
         <Footer />
       </div>
 
-      {/* Toast Container for all children */}
+     
       <ToastContainer
         position="top-right"
         autoClose={2000}

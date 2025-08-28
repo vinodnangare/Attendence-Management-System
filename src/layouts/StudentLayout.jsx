@@ -10,14 +10,13 @@ export default function StudentLayout() {
 
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100">
-      {/* Desktop Sidebar */}
+    
       <aside className="hidden sm:flex flex-col w-64 bg-white shadow-lg">
         <Sidebar activePage={location.pathname} />
       </aside>
 
-      {/* Main Area (Navbar + Content) */}
       <div className="flex-1 flex flex-col">
-        {/* Desktop Navbar */}
+    
         <div className="hidden sm:flex w-full">
           <Navbar
             sidebarOpen={sidebarOpen}
@@ -26,7 +25,7 @@ export default function StudentLayout() {
           />
         </div>
 
-        {/* Mobile Top Bar */}
+        
         <div className="sm:hidden flex items-center justify-between bg-white shadow-lg px-4 py-3 sticky top-0 z-30 rounded-b-2xl">
           <button
             onClick={() => setSidebarOpen(true)}
@@ -39,7 +38,6 @@ export default function StudentLayout() {
           </span>
         </div>
 
-        {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div className="fixed inset-0 z-40 flex">
             <div
@@ -58,7 +56,7 @@ export default function StudentLayout() {
           </div>
         )}
 
-        {/* Main Content */}
+       
         <main className="flex-1 p-6 bg-white  shadow-xl min-h-[80vh]">
           <Outlet />
         </main>
